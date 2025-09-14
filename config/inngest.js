@@ -3,7 +3,10 @@ import connectDb from "./db";
 import User from "@/models/User";
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ id: "voyagerLy-next" });
+export const inngest = new Inngest({ 
+    id: "voyagerLy-next",
+    name: "VoyagerLy App"
+});
 
 // Inngest Function to save user data to a database
 
