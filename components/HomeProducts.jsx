@@ -1,21 +1,72 @@
 import React from "react";
-import ProductCard from "./ProductCard";
-import { useAppContext } from "@/context/AppContext";
+import { HoverEffect } from "@/components/ui/card-hover-effect";
+import { Wrench, Zap, Sparkles, Hammer, Palette, Leaf, AirVent, Cog, Home, Bug, Truck, Move } from "lucide-react";
 
 const HomeProducts = () => {
+  // Map services to HoverEffect items
+  const items = [
+    {
+      title: "Plumbing",
+      description: "Pipe repairs, installations, leak fixes",
+      link: "/all-products?category=plumbing",
+      icon: <Wrench className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Electrical",
+      description: "Wiring, installations, repairs",
+      link: "/all-products?category=electrical",
+      icon: <Zap className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Cleaning",
+      description: "Home and office cleaning services",
+      link: "/all-products?category=cleaning",
+      icon: <Sparkles className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Carpentry",
+      description: "Furniture repair, installations",
+      link: "/all-products?category=carpentry",
+      icon: <Hammer className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Painting",
+      description: "Interior and exterior painting",
+      link: "/all-products?category=painting",
+      icon: <Palette className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Gardening",
+      description: "Lawn care, plant maintenance",
+      link: "/all-products?category=gardening",
+      icon: <Leaf className="w-8 h-8 text-emerald-600" />,
+    },
+    // Additional six services
+    {
+      title: "AC Services",
+      description: "Installations, gas refilling, servicing",
+      link: "/all-products?category=ac-services",
+      icon: <AirVent className="w-8 h-8 text-emerald-600" />,
+    },
+    {
+      title: "Appliance Repair",
+      description: "Fridge, washer, microwave & more",
+      link: "/all-products?category=appliance-repair",
+      icon: <Cog className="w-8 h-8 text-emerald-600" />,
+    }
 
-  const { products, router } = useAppContext()
+  ];
 
   return (
-    <div className="flex flex-col items-center pt-14">
-      <p className="text-2xl font-medium text-left w-full">Popular products</p>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-6 pb-14 w-full">
-        {products.map((product, index) => <ProductCard key={index} product={product} />)}
+    <section className="py-16">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="text-4xl font-bold text-center mb-6 md:mb-12 slide-up">Popular Services</h2>
+        <HoverEffect
+          items={items}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 md:gap-1 lg:gap-2 !py-0"
+        />
       </div>
-      <button onClick={() => { router.push('/all-products') }} className="px-12 py-2.5 border rounded text-gray-500/70 hover:bg-slate-50/90 transition">
-        See more
-      </button>
-    </div>
+    </section>
   );
 };
 

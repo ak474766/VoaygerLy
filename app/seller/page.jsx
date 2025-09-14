@@ -46,7 +46,7 @@ const AddProduct = () => {
         </div>
         <div className="flex flex-col gap-1 max-w-md">
           <label className="text-base font-medium" htmlFor="product-name">
-            Product Name
+            Bussiness Name
           </label>
           <input
             id="product-name"

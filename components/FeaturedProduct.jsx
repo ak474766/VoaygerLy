@@ -1,57 +1,123 @@
+"use client";
 import React from "react";
-import { assets } from "@/assets/assets";
-import Image from "next/image";
+import { BackgroundGradient } from "@/components/ui/background-gradient";
+import { MapPin, Star } from "lucide-react";
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 
-const products = [
+const professionals = [
   {
     id: 1,
-    image: assets.girl_with_headphone_image,
-    title: "Unparalleled Sound",
-    description: "Experience crystal-clear audio with premium headphones.",
+    name: "Test Plumbing Services",
+    city: "Test City",
+    description: "Professional plumbing services with 10+ years experience",
+    rating: 5.0,
+    reviews: 1,
+    price: 75,
+    unit: "/hour",
+    tags: ["pipe repair", "leak detection", "installation"],
+    image:
+      "https://images.unsplash.com/photo-1746095792963-74106bae8658?crop=entropy&cs=srgb&fm=jpg&q=85",
   },
   {
     id: 2,
-    image: assets.girl_with_earphone_image,
-    title: "Stay Connected",
-    description: "Compact and stylish earphones for every occasion.",
+    name: "Home Services Co.",
+    city: "Your City",
+    description: "Trusted home maintenance and handyman services.",
+    rating: 4.9,
+    reviews: 38,
+    price: 60,
+    unit: "/hour",
+    tags: ["handyman work", "Pro fixtures", "repairs"],
+    image:
+      "https://images.unsplash.com/photo-1505798577917-a65157d3320a?crop=entropy&cs=srgb&fm=jpg&q=85",
   },
   {
     id: 3,
-    image: assets.boy_with_laptop_image,
-    title: "Power in Every Pixel",
-    description: "Shop the latest laptops for work, gaming, and more.",
+    name: "Electrical Experts",
+    city: "Metro Area",
+    description: "Certified electricians for safe and reliable work.",
+    rating: 5.0,
+    reviews: 22,
+    price: 85,
+    unit: "/hour",
+    tags: ["connect wiring", "fix appliances", "lighting"],
+    image:
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?crop=entropy&cs=srgb&fm=jpg&q=85",
   },
 ];
 
 const FeaturedProduct = () => {
   return (
-    <div className="mt-14">
-      <div className="flex flex-col items-center">
-        <p className="text-3xl font-medium">Featured Products</p>
-        <div className="w-28 h-0.5 bg-orange-600 mt-2"></div>
+    <section className="mt-16">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold">Top Rated Professionals</h2>
+        <p className="text-gray-600 mt-2">Discover trusted experts near you</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-14 mt-12 md:px-14 px-4">
-        {products.map(({ id, image, title, description }) => (
-          <div key={id} className="relative group">
-            <Image
-              src={image}
-              alt={title}
-              className="group-hover:brightness-75 transition duration-300 w-full h-auto object-cover"
-            />
-            <div className="group-hover:-translate-y-4 transition duration-300 absolute bottom-8 left-8 text-white space-y-2">
-              <p className="font-medium text-xl lg:text-2xl">{title}</p>
-              <p className="text-sm lg:text-base leading-5 max-w-60">
-                {description}
-              </p>
-              <button className="flex items-center gap-1.5 bg-orange-600 px-4 py-2 rounded">
-                Buy now <Image className="h-3 w-3" src={assets.redirect_icon} alt="Redirect Icon" />
-              </button>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 px-4 md:px-6">
+        {professionals.map((pro) => (
+          <CardContainer key={pro.id} containerClassName="py-0" className="w-full">
+            <CardBody className="w-full h-auto">
+              <CardItem translateZ={60} className="w-full">
+                <BackgroundGradient containerClassName="rounded-3xl" className="rounded-3xl">
+                  <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-emerald-100">
+                    <div className="h-44 md:h-52 w-full overflow-hidden">
+                      <img
+                        src={pro.image}
+                        alt={pro.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-5 md:p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-xl font-semibold">{pro.name}</h3>
+                          <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
+                            <MapPin className="w-4 h-4" />
+                            <span>{pro.city}</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center gap-1 text-emerald-700 font-semibold">
+                            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            <span>{pro.rating.toFixed(1)}</span>
+                          </div>
+                          <div className="text-xs text-gray-500">({pro.reviews} reviews)</div>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-600 mt-3">{pro.description}</p>
+
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="text-emerald-700 font-bold text-xl">
+                          ₹{pro.price}
+                          <span className="text-sm font-medium text-gray-500">{pro.unit}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {pro.tags.map((t, i) => (
+                            <span
+                              key={i}
+                              className="px-2.5 py-1 text-xs rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button className="mt-5 w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-medium">
+                        View Profile
+                      </button>
+                    </div>
+                  </div>
+                </BackgroundGradient>
+              </CardItem>
+            </CardBody>
+          </CardContainer>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

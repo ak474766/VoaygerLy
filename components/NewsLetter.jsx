@@ -1,27 +1,68 @@
+"use client";
 import React from "react";
+import { WavyBackground } from "@/components/ui/wavy-background";
+import { Button as StatefulButton } from "@/components/ui/stateful-button";
 
 const NewsLetter = () => {
   return (
-    <div className="flex flex-col items-center justify-center text-center space-y-2 pt-8 pb-14">
-      <h1 className="md:text-4xl text-2xl font-medium">
-        Subscribe now & get 20% off
-      </h1>
-      <p className="md:text-base text-gray-500/80 pb-8">
-        Lorem Ipsum is simply dummy text of the printing and typesetting
-        industry.
-      </p>
-      <div className="flex items-center justify-between max-w-2xl w-full md:h-14 h-12">
-        <input
-          className="border border-gray-500/30 rounded-md h-full border-r-0 outline-none w-full rounded-r-none px-3 text-gray-500"
-          type="text"
-          placeholder="Enter your email id"
-        />
-        <button className="md:px-12 px-8 h-full text-white bg-orange-600 rounded-md rounded-l-none">
-          Subscribe
-        </button>
-      </div>
-    </div>
+    <section className="relative mt-5 ">
+      <WavyBackground
+        containerClassName=""
+        className=""
+        colors={["#38bdf8", "#818cf8", "#c084fc", "#e879f9", "#22d3ee"]}
+        waveWidth={50}
+        backgroundFill="#E6E4E0"
+        blur={10}
+        speed="fast"
+        waveOpacity={0.5}
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-emerald-900 drop-shadow-sm">
+            Subscribe now & get 20% off
+          </h2>
+          <p className="mt-3 text-emerald-900/80 text-base md:text-lg">
+            Join our newsletter for exclusive offers and updates from top-rated professionals.
+          </p>
+
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="mt-8 mx-auto max-w-xl flex items-stretch bg-white/90 backdrop-blur rounded-2xl shadow-lg ring-1 ring-emerald-900/10 overflow-hidden"
+          >
+            <EmailInputAndButton />
+          </form>
+        </div>
+      </WavyBackground>
+    </section>
   );
 };
 
 export default NewsLetter;
+
+// Sub-component: controlled input + stateful subscribe button
+const EmailInputAndButton = () => {
+  const [email, setEmail] = React.useState("");
+  const handleSubscribe = async () => {
+    // simulate API call latency
+    await new Promise((r) => setTimeout(r, 800));
+    // TODO: hook up to your backend/newsletter service
+  };
+  return (
+    <>
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter your email address"
+        className="flex-1 px-4 md:px-5 py-3 md:py-4 text-gray-700 placeholder:text-gray-400 outline-none bg-transparent"
+      />
+      <StatefulButton
+        type="submit"
+        onClick={handleSubscribe}
+        className="px-5 md:px-6 py-3 md:py-4 bg-emerald-700 hover:bg-emerald-800 rounded-none md:rounded-none"
+      >
+        Subscribe
+      </StatefulButton>
+    </>
+  );
+};
