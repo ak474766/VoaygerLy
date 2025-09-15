@@ -118,11 +118,11 @@ const Navbar = () => {
               </SignedIn>
             )}
             <SignedIn>
-              <button onClick={() => { setMobileOpen(false); router.push('/cart'); }} className="flex items-center gap-2 py-2">
+              <button onClick={() => { setMobileOpen(false); router.push('/home/cart'); }} className="flex items-center gap-2 py-2">
                 <User className="w-4 h-4" aria-label="user icon" />
                 Account
               </button>
-              <button onClick={() => { setMobileOpen(false); router.push('/my-orders'); }} className="flex items-center gap-2 py-2">
+              <button onClick={() => { setMobileOpen(false); router.push('/home/my-orders'); }} className="flex items-center gap-2 py-2">
                 <User className="w-4 h-4" aria-label="user icon" />
                 My Orders
               </button>
