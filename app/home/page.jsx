@@ -38,30 +38,31 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative mbg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white py-16 md:py-20 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white py-20 md:py-24 lg:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-10"></div>
         <div className="absolute top-0 left-0 w-full h-full">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full"></div>
-          <div className="absolute top-32 right-20 w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
-          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full animate-pulse"></div>
+          <div className="absolute top-32 right-20 w-16 h-16 bg-white bg-opacity-10 rounded-full animate-pulse delay-100"></div>
+          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white bg-opacity-10 rounded-full animate-pulse delay-200"></div>
+          <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-white bg-opacity-5 rounded-full animate-pulse delay-300"></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            Find Local <span className="text-yellow-300">Service Providers</span>
+        <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 text-center relative z-10 max-w-6xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-8 leading-tight tracking-tight">
+            Find Local <span className="text-yellow-300 drop-shadow-lg">Service Providers</span>
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl lg:text-2xl mb-12 text-blue-100 max-w-4xl mx-auto leading-relaxed font-light">
             Connect with trusted plumbers, electricians, cleaners, and more in your area. Book services instantly with transparent pricing in Indian Rupees.
           </p>
           
           {/* Search Form */}
-          <div className="max-w-5xl mx-auto bg-white rounded-2xl p-4 md:p-6 shadow-2xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border border-white/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors text-sm md:text-base"
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm md:text-base font-medium bg-gray-50 hover:bg-white"
               >
                 <option value="">🔍 All Categories</option>
                 {serviceCategories.map((category) => (
@@ -72,14 +73,14 @@ export default function HomePage() {
               </select>
               <input
                 placeholder="📍 Enter your location"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors text-sm md:text-base"
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm md:text-base font-medium bg-gray-50 hover:bg-white"
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
               <input
                 placeholder="⭐ Min Rating (1-5)"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors text-sm md:text-base"
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm md:text-base font-medium bg-gray-50 hover:bg-white"
                 min="1"
                 max="5"
                 step="0.1"
@@ -87,7 +88,7 @@ export default function HomePage() {
                 value={minRating}
                 onChange={(e) => setMinRating(e.target.value)}
               />
-              <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-3 rounded-xl flex items-center justify-center space-x-2 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 text-sm md:text-base">
+              <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-4 rounded-xl flex items-center justify-center space-x-2 font-bold shadow-xl transition-all duration-200 transform hover:scale-105 hover:shadow-2xl text-sm md:text-base">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -110,7 +111,7 @@ export default function HomePage() {
           </div>
 
           {/* Features */}
-          <div className="mt-8 md:mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 lg:space-x-8 text-blue-100">
+          <div className="mt-12 md:mt-16 flex flex-col sm:flex-row justify-center items-center space-y-6 sm:space-y-0 sm:space-x-8 lg:space-x-12 text-blue-100">
             <div className="flex items-center space-x-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,18 +170,21 @@ export default function HomePage() {
       </div>
 
       {/* Service Providers Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8 text-center">Available Service Providers</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16 md:py-20 max-w-7xl">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Available Service Providers</h2>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Discover trusted professionals in your area with verified ratings and transparent pricing</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {products.map((provider) => (
             <div
               key={provider._id}
-              className="bg-white rounded-xl shadow-lg p-4 md:p-6 hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 transform hover:-translate-y-1"
+              className="bg-white rounded-2xl shadow-lg p-6 md:p-8 hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-blue-300 transform hover:-translate-y-2 hover:scale-[1.02] group"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-6">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 truncate">{provider.businessName}</h3>
-                  <p className="text-gray-600 font-medium text-sm md:text-base truncate">{provider.providerName}</p>
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 truncate group-hover:text-blue-600 transition-colors">{provider.businessName}</h3>
+                  <p className="text-gray-600 font-semibold text-base md:text-lg truncate">{provider.providerName}</p>
                   <div className="flex items-center mt-2 mb-3">
                     <div className="flex items-center space-x-1">
                       {renderStars(provider.rating)}
@@ -189,12 +193,12 @@ export default function HomePage() {
                     <span className="text-xs md:text-sm text-gray-500">({provider.reviewCount} reviews)</span>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-green-400 to-green-500 text-white px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-bold whitespace-nowrap ml-2">
+                <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full text-sm md:text-base font-bold whitespace-nowrap ml-4 shadow-lg">
                   ₹{provider.hourlyRate}/hr
                 </div>
               </div>
-              <p className="text-gray-700 mb-4 text-sm md:text-base line-clamp-2">{provider.description}</p>
-              <div className="space-y-2 mb-4">
+              <p className="text-gray-700 mb-6 text-base md:text-lg line-clamp-3 leading-relaxed">{provider.description}</p>
+              <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-2 text-xs md:text-sm text-gray-600">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -231,18 +235,18 @@ export default function HomePage() {
                   <span className="font-medium">{provider.phone}</span>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-1 md:gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 md:gap-3 mb-6">
                 {provider.categoryNames.map((category, index) => (
                   <span
                     key={index}
-                    className="bg-blue-50 text-blue-700 px-2 md:px-3 py-1 rounded-full text-xs font-medium border border-blue-200"
+                    className="bg-blue-50 text-blue-700 px-3 md:px-4 py-2 rounded-full text-sm font-semibold border border-blue-200 hover:bg-blue-100 transition-colors"
                   >
                     {category}
                   </span>
                 ))}
               </div>
               <a
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 md:py-3 px-4 rounded-lg text-center block transition-all duration-200 font-semibold shadow-md hover:shadow-lg text-sm md:text-base"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-xl text-center block transition-all duration-200 font-bold shadow-lg hover:shadow-xl text-base md:text-lg transform hover:scale-[1.02]"
                 href={`/provider/${provider._id}`}
               >
                 View Details & Book Service
