@@ -1,13 +1,11 @@
-'use client'
+"use client"
 import React from "react";
 import HomeProducts from "@/components/HomeProducts";
 import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { HeroParallax } from "@/components/ui/hero-parallax";
 
-const Home = () => {
+export default function HomePage() {
   const products = [
     { title: "Skilled Workers", link: "#", thumbnail: "https://i.ibb.co/BH0JRM6Z/Whats-App-Image-2025-09-14-at-23-05-24-6aa52734.jpg" },
     { title: "Local Pros At Work", link: "#", thumbnail: "https://images.unsplash.com/photo-1746095792963-74106bae8658?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBzZXJ2aWNlJTIwd29ya2Vyc3xlbnwwfHx8fDE3NTc2MDk2MDV8MA&ixlib=rb-4.1.0&q=85" },
@@ -20,19 +18,15 @@ const Home = () => {
     { title: "Skilled Workers", link: "#", thumbnail: "https://i.ibb.co/BH0JRM6Z/Whats-App-Image-2025-09-14-at-23-05-24-6aa52734.jpg" },
     { title: "Local Pros 2", link: "#", thumbnail: "https://images.unsplash.com/photo-1746095792963-74106bae8658?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBzZXJ2aWNlJTIwd29ya2Vyc3xlbnwwfHx8fDE3NTc2MDk2MDV8MA&ixlib=rb-4.1.0&q=85" },
   ];
+
   return (
     <>
-      <Navbar/>
       <HeroParallax products={products} />
-      <div className="px-6 md:px-16 lg:px-32">
+      <div className="px-0 md:px-0 lg:px-0">
         <HomeProducts />
         <FeaturedProduct />
-
       </div>
       <NewsLetter />
-      <Footer />
     </>
   );
-};
-
-export default Home;
+}
