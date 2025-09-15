@@ -6,6 +6,8 @@ import { HeroParallax } from "@/components/ui/hero-parallax";
 import HomeProducts from "@/components/HomeProducts";
 import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const Landing = () => {
   const router = useRouter();
@@ -30,12 +32,14 @@ const Landing = () => {
 
   return (
     <div >
+      <Navbar/>
       <HeroParallax products={products} />
       <div className="px-0 md:px-0 lg:px-0">
         <HomeProducts />
         <FeaturedProduct />
       </div>
       <NewsLetter />
+      <Footer/>
       </div>
   );
 }
