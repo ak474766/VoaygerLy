@@ -28,7 +28,7 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "date-fns": "^3.6.0",
-    "react-calendar": "^4.8.0",
+    "react-calendar": "^6.0.0",
     "react-select": "^5.8.0",
     "react-dropzone": "^14.2.3",
     "framer-motion": "^11.0.24",
