@@ -21,7 +21,7 @@ export async function POST(request) {
     } = body;
 
     // Check if provider already exists
-    const existingProvider = await ServiceProvider.findOne({ email });
+    const existingProvider = await ServiceProvider.findOne({ userId: email });
     if (existingProvider) {
       return NextResponse.json(
         { message: "Provider with this email already exists" },
@@ -34,20 +34,22 @@ export async function POST(request) {
 
     // Create new service provider
     const newProvider = new ServiceProvider({
-      providerName: fullName,
+      userId: email, // Using email as temporary userId
       businessName,
-      email,
-      password: password,
-      phone,
       description,
-      location,
-      pricingType,
-      hourlyRate: parseFloat(baseRate),
-      categoryNames: categories,
-      rating: 0,
-      reviewCount: 0,
+      categories: categories,
+      pricing: {
+        type: pricingType,
+        hourlyRate: parseFloat(baseRate),
+        currency: 'INR'
+      },
+      serviceAreas: [{
+        areaName: location,
+        radiusKm: 10
+      }],
       isVerified: false,
-      createdAt: new Date()
+      isActive: true,
+      verificationStatus: 'pending'
     });
 
     await newProvider.save();
@@ -63,7 +65,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Internal server error", error: error.message },
       { status: 500 }
     );
   }
