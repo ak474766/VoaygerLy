@@ -20,7 +20,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div>
+    <div >
       <HeroParallax products={products} />
       <div className="px-0 md:px-0 lg:px-0">
         <HomeProducts />

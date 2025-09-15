@@ -3,6 +3,9 @@ import React, { useEffect } from "react";
 import { useUser, SignedOut } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { HeroParallax } from "@/components/ui/hero-parallax";
+import HomeProducts from "@/components/HomeProducts";
+import NewsLetter from "@/components/NewsLetter";
+import FeaturedProduct from "@/components/FeaturedProduct";
 
 const Landing = () => {
   const router = useRouter();
@@ -26,18 +29,16 @@ const Landing = () => {
   ];
 
   return (
-    <SignedOut>
+    <div >
       <HeroParallax products={products} />
-      <div className="max-w-4xl mx-auto px-6 py-10 text-center">
-        <h2 className="text-2xl md:text-3xl font-semibold">Connect with verified local service experts</h2>
-        <p className="mt-3 text-gray-600">Sign in to explore providers, manage bookings, and more.</p>
-        <div className="mt-6 flex items-center justify-center gap-3">
-          <a href="/sign-in" className="px-5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white">Sign in</a>
-          <a href="/sign-up" className="px-5 py-2.5 rounded-full bg-gray-900 hover:bg-black text-white">Create account</a>
-        </div>
+      <div className="px-0 md:px-0 lg:px-0">
+        <HomeProducts />
+        <FeaturedProduct />
       </div>
-    </SignedOut>
+      <NewsLetter />
+      </div>
   );
-};
+}
+
 
 export default Landing;
