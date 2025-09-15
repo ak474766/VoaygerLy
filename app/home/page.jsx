@@ -1,32 +1,263 @@
 "use client"
-import React from "react";
+import React, { useState } from "react";
+import { useAppContext } from "@/context/AppContext";
+import { serviceCategories } from "@/assets/assets";
 import HomeProducts from "@/components/HomeProducts";
 import NewsLetter from "@/components/NewsLetter";
 import FeaturedProduct from "@/components/FeaturedProduct";
-import { HeroParallax } from "@/components/ui/hero-parallax";
 
 export default function HomePage() {
-  const products = [
-    { title: "Skilled Workers", link: "#", thumbnail: "https://i.ibb.co/BH0JRM6Z/Whats-App-Image-2025-09-14-at-23-05-24-6aa52734.jpg" },
-    { title: "Local Pros At Work", link: "#", thumbnail: "https://images.unsplash.com/photo-1746095792963-74106bae8658?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBzZXJ2aWNlJTIwd29ya2Vyc3xlbnwwfHx8fDE3NTc2MDk2MDV8MA&ixlib=rb-4.1.0&q=85" },
-    { title: "Home Services", link: "#", thumbnail: "https://images.unsplash.com/photo-1505798577917-a65157d3320a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxob21lJTIwc2VydmljZXN8ZW58MHx8fHwxNzU3NTQyMzg1fDA&ixlib=rb-4.1.0&q=85" },
-    { title: "Electrical Experts", link: "#", thumbnail: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwzfHxlbGVjdHJpY2lhbnxlbnwwfHx8fDE3NTc2MDk2Mjd8MA&ixlib=rb-4.1.0&q=85" },
-    { title: "Skilled Workers", link: "#", thumbnail: "https://i.postimg.cc/QxCmCVpS/david-lembas-57ldq9age5-U-unsplash.jpg" },
-    { title: "Gardning Expert ", link: "#", thumbnail: "https://i.postimg.cc/Vk6hyms0/sandie-clarke-q13-Zq1-Jufks-unsplash.jpg'" },
-    { title: "Certified Electricians", link: "#", thumbnail: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwzfHxlbGVjdHJpY2lhbnxlbnwwfHx8fDE3NTc2MDk2Mjd8MA&ixlib=rb-4.1.0&q=85" },
-    { title: "Home Services 2", link: "#", thumbnail: "https://i.postimg.cc/RZ4HqZJq/battlecreek-coffee-roasters-Nf-G4r-Xmce-FM-unsplash.jpg" },
-    { title: "Skilled Workers", link: "#", thumbnail: "https://i.ibb.co/BH0JRM6Z/Whats-App-Image-2025-09-14-at-23-05-24-6aa52734.jpg" },
-    { title: "Local Pros 2", link: "#", thumbnail: "https://images.unsplash.com/photo-1746095792963-74106bae8658?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBzZXJ2aWNlJTIwd29ya2Vyc3xlbnwwfHx8fDE3NTc2MDk2MDV8MA&ixlib=rb-4.1.0&q=85" },
-  ];
+  const { products } = useAppContext();
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [minRating, setMinRating] = useState("");
+
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <svg
+          key={i}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`h-4 w-4 ${
+            i <= Math.floor(rating)
+              ? "text-yellow-400 fill-current"
+              : "text-gray-300"
+          }`}
+        >
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+        </svg>
+      );
+    }
+    return stars;
+  };
 
   return (
-    <div >
-      <HeroParallax products={products} />
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute top-32 right-20 w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white bg-opacity-10 rounded-full"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Find Local <span className="text-yellow-300">Service Providers</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            Connect with trusted plumbers, electricians, cleaners, and more in your area. Book services instantly with transparent pricing in Indian Rupees.
+          </p>
+          
+          {/* Search Form */}
+          <div className="max-w-5xl mx-auto bg-white rounded-2xl p-6 shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors"
+              >
+                <option value="">🔍 All Categories</option>
+                {serviceCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                placeholder="📍 Enter your location"
+                className="border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors"
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <input
+                placeholder="⭐ Min Rating (1-5)"
+                className="border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors"
+                min="1"
+                max="5"
+                step="0.1"
+                type="number"
+                value={minRating}
+                onChange={(e) => setMinRating(e.target.value)}
+              />
+              <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl flex items-center justify-center space-x-2 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
+                >
+                  <path d="m21 21-4.34-4.34"></path>
+                  <circle cx="11" cy="11" r="8"></circle>
+                </svg>
+                <span>Search Services</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="mt-12 flex justify-center items-center space-x-8 text-blue-100">
+            <div className="flex items-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-green-400"
+              >
+                <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                <path d="m9 11 3 3L22 4"></path>
+              </svg>
+              <span className="font-semibold">Verified Providers</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-yellow-400 fill-current"
+              >
+                <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+              </svg>
+              <span className="font-semibold">Top Rated Services</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-blue-300"
+              >
+                <path d="M12 6v6l4 2"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
+              <span className="font-semibold">Quick Booking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Service Providers Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">Available Service Providers</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((provider) => (
+            <div
+              key={provider._id}
+              className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 transform hover:-translate-y-1"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{provider.businessName}</h3>
+                  <p className="text-gray-600 font-medium">{provider.providerName}</p>
+                  <div className="flex items-center mt-2 mb-3">
+                    <div className="flex items-center space-x-1">
+                      {renderStars(provider.rating)}
+                    </div>
+                    <span className="ml-2 text-sm font-semibold text-gray-700">{provider.rating.toFixed(1)}</span>
+                    <span className="text-sm text-gray-500">({provider.reviewCount} reviews)</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-green-400 to-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  ₹{provider.hourlyRate}/hr
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 line-clamp-2">{provider.description}</p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4 text-blue-500"
+                  >
+                    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span className="font-medium">{provider.location}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4 text-green-500"
+                  >
+                    <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"></path>
+                  </svg>
+                  <span className="font-medium">{provider.phone}</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {provider.categoryNames.map((category, index) => (
+                  <span
+                    key={index}
+                    className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+              <a
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg text-center block transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                href={`/provider/${provider._id}`}
+              >
+                View Details & Book Service
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="px-0 md:px-0 lg:px-0">
         <HomeProducts />
         <FeaturedProduct />
       </div>
       <NewsLetter />
-      </div>
+    </div>
   );
 }
