@@ -38,7 +38,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative mbg-gray-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white py-16 md:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-10"></div>
