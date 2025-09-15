@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/config/db";
 import ServiceProvider from "@/models/ServiceProvider";
-import bcrypt from "bcryptjs";
 
 export async function POST(request) {
   try {
@@ -30,15 +29,15 @@ export async function POST(request) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // For now, store password as plain text (you should implement proper hashing in production)
+    // const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create new service provider
     const newProvider = new ServiceProvider({
       providerName: fullName,
       businessName,
       email,
-      password: hashedPassword,
+      password: password,
       phone,
       description,
       location,
