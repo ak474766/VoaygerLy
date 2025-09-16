@@ -1,12 +1,14 @@
-'use client'
-import { useUser } from '@clerk/nextjs'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+"use client";
+import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Header from "@/app/home/_components/Header";
+import SidebarToggle from "@/app/home/_components/SidebarToggle";
 
 export default function SellerDashboard() {
-  const { user } = useUser()
-  const [services, setServices] = useState([])
-  const [bookings, setBookings] = useState([])
+  const { user } = useUser();
+  const [services, setServices] = useState([]);
   const [stats, setStats] = useState({
     totalServices: 0,
     activeServices: 0,
@@ -14,34 +16,33 @@ export default function SellerDashboard() {
     pendingBookings: 0,
     totalEarnings: 0,
     rating: 0
-  })
-  const [loading, setLoading] = useState(true)
-  const [showAddService, setShowAddService] = useState(false)
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSellerData()
-  }, [])
+    fetchSellerData();
+  }, []);
 
   const fetchSellerData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       // Fetch seller's services
-      const servicesResponse = await fetch('/api/services?providerId=current')
+      const servicesResponse = await fetch('/api/services?providerId=current');
       if (servicesResponse.ok) {
-        const servicesData = await servicesResponse.json()
-        setServices(servicesData.services)
+        const servicesData = await servicesResponse.json();
+        setServices(servicesData.services || []);
         setStats(prev => ({
           ...prev,
-          totalServices: servicesData.services.length,
-          activeServices: servicesData.services.filter(s => s.status === 'active').length
-        }))
+          totalServices: servicesData.services?.length || 0,
+          activeServices: servicesData.services?.filter(s => s.status === 'active').length || 0
+        }));
       }
     } catch (error) {
-      console.error('Error fetching seller data:', error)
+      console.error('Error fetching seller data:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleServiceToggle = async (serviceId, newStatus) => {
     try {
@@ -49,25 +50,25 @@ export default function SellerDashboard() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ serviceId, status: newStatus })
-      })
+      });
       
       if (response.ok) {
-        fetchSellerData()
+        fetchSellerData();
       }
     } catch (error) {
-      console.error('Error updating service:', error)
+      console.error('Error updating service:', error);
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600 text-lg">Loading your dashboard...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
