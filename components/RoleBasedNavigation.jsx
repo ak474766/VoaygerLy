@@ -54,16 +54,17 @@ export default function RoleBasedNavigation() {
 
   const navigationItems = {
     user: [
-      { name: 'Customer Dashboard', href: '/customer/dashboard' },
-      { name: 'My Bookings', href: '/customer/bookings' },
-      { name: 'Messages', href: '/customer/messages' },
+      { name: 'Home', href: '/home' },
+      { name: 'Find Services', href: '/home/all-products' },
+      { name: 'My Bookings', href: '/bookings' },
+      { name: 'Messages', href: '/messages' },
     ],
     serviceProvider: [
-      { name: 'Seller Dashboard', href: '/seller/dashboard' },
-      { name: 'Add Service', href: '/seller/add-service' },
-      { name: 'Bookings', href: '/seller/bookings' },
-      { name: 'Reviews', href: '/seller/reviews' },
-      { name: 'Messages', href: '/seller/messages' },
+      { name: 'Dashboard', href: '/service-provider/dashboard' },
+      { name: 'My Services', href: '/service-provider/services' },
+      { name: 'Bookings', href: '/service-provider/bookings' },
+      { name: 'Messages', href: '/service-provider/messages' },
+      { name: 'Earnings', href: '/service-provider/earnings' },
     ],
     admin: [
       { name: 'Admin Dashboard', href: '/admin/dashboard' },
@@ -119,7 +120,7 @@ export default function RoleBasedNavigation() {
                 {/* Role Switch */}
                 {userRole === 'serviceProvider' && (
                   <button
-                    onClick={() => router.push('/customer/dashboard')}
+                    onClick={() => router.push('/home')}
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                   >
                     View as Customer
