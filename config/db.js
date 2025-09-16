@@ -16,8 +16,12 @@ async function connectDb() {
         const opts = {
             bufferCommands:false
         }
+        const uri = process.env.MONGODB_URI;
+        if (!uri || typeof uri !== 'string' || !uri.startsWith('mongodb')) {
+            throw new Error("MONGODB_URI is not set or is invalid. Please set a valid MongoDB connection string in your .env file.");
+        }
         cached.promise = mongoose
-            .connect(`${process.env.MONGODB_URI}/Voyagerly`, opts)
+            .connect(uri, opts)
             .then(mongoose => {
                 return mongoose;
             });
