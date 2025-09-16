@@ -1,18 +1,37 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/api/inngest(.*)',
-  '/api/mongodb(.*)',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/forum(.*)',
+  '/service-provider(.*)',
+  '/admin(.*)',
   '/home(.*)',
 ])
 
+const isServiceProviderRoute = createRouteMatcher([
+  '/service-provider(.*)',
+])
+
+const isAdminRoute = createRouteMatcher([
+  '/admin(.*)',
+])
+
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
+  // Protect all routes that require authentication
+  if (isProtectedRoute(req)) {
     await auth.protect()
+    
+    const { userId } = await auth()
+    
+    if (userId && (isServiceProviderRoute(req) || isAdminRoute(req))) {
+      // For service provider and admin routes, we'll let the pages handle role checking
+      // since we need to make API calls to get user role from our database
+      return NextResponse.next()
+    }
   }
+  
+  return NextResponse.next()
 })
 
 export const config = {
