@@ -145,7 +145,8 @@ bookingSchema.index({ scheduledDate: 1 });
 bookingSchema.index({ category: 1 });
 bookingSchema.index({ "payment.status": 1 });
 bookingSchema.index({ createdAt: -1 });
-bookingSchema.index({ "serviceLocation.coordinates": "2dsphere" });
+// Make geospatial index sparse to avoid indexing errors on docs without valid geo
+bookingSchema.index({ "serviceLocation.coordinates": "2dsphere" }, { sparse: true });
 
 // Update timeline when status changes
 bookingSchema.pre('save', function(next) {
@@ -166,3 +167,4 @@ bookingSchema.pre('save', function(next) {
 const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
 
 export default Booking;
+

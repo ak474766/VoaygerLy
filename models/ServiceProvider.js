@@ -121,7 +121,8 @@ const serviceProviderSchema = new mongoose.Schema({
 // Indexes for performance
 serviceProviderSchema.index({ userId: 1 });
 serviceProviderSchema.index({ categories: 1 });
-serviceProviderSchema.index({ "serviceAreas.location": "2dsphere" });
+// Make geospatial index sparse so providers without coordinates don't throw indexing errors
+serviceProviderSchema.index({ "serviceAreas.location": "2dsphere" }, { sparse: true });
 serviceProviderSchema.index({ "rating.average": -1 });
 serviceProviderSchema.index({ "pricing.hourlyRate": 1 });
 serviceProviderSchema.index({ isActive: 1, isVerified: 1 });
@@ -136,3 +137,4 @@ serviceProviderSchema.pre('save', function(next) {
 const ServiceProvider = mongoose.models.ServiceProvider || mongoose.model('ServiceProvider', serviceProviderSchema);
 
 export default ServiceProvider;
+

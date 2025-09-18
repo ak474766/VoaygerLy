@@ -53,7 +53,8 @@ const userSchema = new mongoose.Schema({
 
 // Indexes for performance
 userSchema.index({ role: 1 });
-userSchema.index({ "location.coordinates": "2dsphere" });
+// Make geospatial index sparse so documents without valid geo data don't throw indexing errors
+userSchema.index({ "location.coordinates": "2dsphere" }, { sparse: true });
 userSchema.index({ isActive: 1 });
 
 // Update the updatedAt field before saving

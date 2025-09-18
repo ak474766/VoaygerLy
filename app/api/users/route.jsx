@@ -10,6 +10,43 @@ async function readJson(req) {
   }
 }
 
+// Helper: normalize various "location" shapes into our schema with GeoJSON Point
+function normalizeLocation(input) {
+  if (!input || typeof input !== "object") return undefined;
+
+  const out = {};
+  if (typeof input.address === "string") out.address = input.address;
+  if (typeof input.city === "string") out.city = input.city;
+  if (typeof input.state === "string") out.state = input.state;
+  if (typeof input.pincode === "string") out.pincode = input.pincode;
+
+  let lngLat;
+  if (typeof input.longitude === "number" && typeof input.latitude === "number") {
+    lngLat = [input.longitude, input.latitude];
+  }
+  if (!lngLat && Array.isArray(input.coordinates) && input.coordinates.length === 2) {
+    const [lng, lat] = input.coordinates;
+    if (typeof lng === "number" && typeof lat === "number") lngLat = [lng, lat];
+  }
+  if (!lngLat && input.coordinates && typeof input.coordinates === "object") {
+    const c = input.coordinates;
+    if (c.type === "Point" && Array.isArray(c.coordinates) && c.coordinates.length === 2) {
+      const [lng, lat] = c.coordinates;
+      if (typeof lng === "number" && typeof lat === "number") lngLat = [lng, lat];
+    } else if (typeof c.longitude === "number" && typeof c.latitude === "number") {
+      lngLat = [c.longitude, c.latitude];
+    } else if (typeof c.lng === "number" && typeof c.lat === "number") {
+      lngLat = [c.lng, c.lat];
+    }
+  }
+
+  if (lngLat) {
+    out.coordinates = { type: "Point", coordinates: lngLat };
+  }
+
+  return Object.keys(out).length ? out : undefined;
+}
+
 // GET /api/users?id=123
 // - If id is provided, returns that user; otherwise returns up to 50 users
 export async function GET(req) {
@@ -37,7 +74,7 @@ export async function POST(req) {
   try {
     await connectDb();
     const body = await readJson(req);
-    const { id, email, name, imageUrl, cartItems } = body || {};
+    const { id, email, name, imageUrl, cartItems, location } = body || {};
 
     if (!id || !email || !name || !imageUrl) {
       return Response.json({ ok: false, error: "Missing required fields: id, email, name, imageUrl" }, { status: 400 });
@@ -49,6 +86,7 @@ export async function POST(req) {
       name,
       imageUrl,
       ...(cartItems ? { cartItems } : {}),
+      ...(normalizeLocation(location) ? { location: normalizeLocation(location) } : {}),
     };
 
     const saved = await User.findByIdAndUpdate(id, userDoc, { new: true, upsert: true, setDefaultsOnInsert: true });
@@ -64,8 +102,13 @@ export async function PUT(req) {
   try {
     await connectDb();
     const body = await readJson(req);
-    const { id, ...updates } = body || {};
+    const { id, location, ...rest } = body || {};
     if (!id) return Response.json({ ok: false, error: "Missing required field: id" }, { status: 400 });
+
+    const updates = {
+      ...rest,
+      ...(normalizeLocation(location) ? { location: normalizeLocation(location) } : {}),
+    };
 
     const updated = await User.findByIdAndUpdate(id, updates, { new: true });
     if (!updated) return Response.json({ ok: false, error: "User not found" }, { status: 404 });

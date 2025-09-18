@@ -4,6 +4,26 @@ import connectDb from "@/config/db";
 import User from "@/models/User";
 import ServiceProvider from "@/models/ServiceProvider";
 
+// Helper: normalize to GeoJSON Point for service area locations
+function normalizePoint(input) {
+    if (!input || typeof input !== 'object') return undefined;
+    // Cases: { longitude, latitude } OR [lng, lat] OR { type:'Point', coordinates:[lng,lat] } OR { lng, lat }
+    if (typeof input.longitude === 'number' && typeof input.latitude === 'number') {
+        return { type: 'Point', coordinates: [input.longitude, input.latitude] };
+    }
+    if (Array.isArray(input) && input.length === 2 && typeof input[0] === 'number' && typeof input[1] === 'number') {
+        return { type: 'Point', coordinates: [input[0], input[1]] };
+    }
+    if (input.type === 'Point' && Array.isArray(input.coordinates) && input.coordinates.length === 2) {
+        const [lng, lat] = input.coordinates;
+        if (typeof lng === 'number' && typeof lat === 'number') return { type: 'Point', coordinates: [lng, lat] };
+    }
+    if (typeof input.lng === 'number' && typeof input.lat === 'number') {
+        return { type: 'Point', coordinates: [input.lng, input.lat] };
+    }
+    return undefined;
+}
+
 export async function POST(request) {
     try {
         const { userId } = await auth();
@@ -50,6 +70,17 @@ export async function POST(request) {
             );
         }
 
+        // Normalize service areas: only keep entries with valid GeoJSON Point
+        let normalizedServiceAreas = Array.isArray(serviceAreas) ? serviceAreas.map(sa => {
+            const location = normalizePoint(sa?.location || sa?.coordinates || sa);
+            if (!location) return undefined;
+            return {
+                location,
+                radiusKm: typeof sa?.radiusKm === 'number' ? sa.radiusKm : 10,
+                areaName: typeof sa?.areaName === 'string' ? sa.areaName : undefined
+            };
+        }).filter(Boolean) : [];
+
         // Create service provider profile
         const newProvider = new ServiceProvider({
             userId,
@@ -62,7 +93,7 @@ export async function POST(request) {
                 hourlyRate: 0,
                 currency: 'INR'
             },
-            serviceAreas: serviceAreas || [],
+            serviceAreas: normalizedServiceAreas,
             availability: availability || {
                 workingDays: [],
                 timeSlotDuration: 60,
