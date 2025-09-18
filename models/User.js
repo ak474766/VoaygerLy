@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
         state: { type: String },
         pincode: { type: String },
         coordinates: {
-            type: { type: String, enum: ['Point'], default: 'Point' },
+            type: { type: String, enum: ['Point'] },
             coordinates: { type: [Number] } // [longitude, latitude]
         }
     },
@@ -53,13 +53,41 @@ const userSchema = new mongoose.Schema({
 
 // Indexes for performance
 userSchema.index({ role: 1 });
-// Make geospatial index sparse so documents without valid geo data don't throw indexing errors
-userSchema.index({ "location.coordinates": "2dsphere" }, { sparse: true });
+// Geospatial index: include only docs with valid GeoJSON structure
+userSchema.index(
+    { "location.coordinates": "2dsphere" },
+    {
+        sparse: true,
+        partialFilterExpression: {
+            "location.coordinates.type": "Point",
+            "location.coordinates.coordinates": { $type: "array" }
+        }
+    }
+);
 userSchema.index({ isActive: 1 });
 
 // Update the updatedAt field before saving
 userSchema.pre('save', function(next) {
     this.updatedAt = new Date();
+    // Strip invalid/empty location structures to avoid inserting partial GeoJSON
+    if (this.location) {
+        const loc = this.location;
+        const hasAddress = !!(loc.address || loc.city || loc.state || loc.pincode);
+        const geo = loc.coordinates;
+        const validGeo = geo && geo.type === 'Point' && Array.isArray(geo.coordinates) && geo.coordinates.length === 2 &&
+            typeof geo.coordinates[0] === 'number' && typeof geo.coordinates[1] === 'number';
+
+        // If coordinates object exists but invalid, remove it
+        if (geo && !validGeo) {
+            delete loc.coordinates;
+        }
+
+        // If nothing left in location, remove location entirely
+        const stillHasGeo = loc.coordinates && loc.coordinates.type === 'Point' && Array.isArray(loc.coordinates.coordinates);
+        if (!hasAddress && !stillHasGeo) {
+            this.location = undefined;
+        }
+    }
     next();
 });
 

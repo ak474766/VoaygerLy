@@ -41,7 +41,7 @@ const serviceProviderSchema = new mongoose.Schema({
     // Service Areas (geospatial)
     serviceAreas: [{
         location: {
-            type: { type: String, enum: ['Point'], default: 'Point' },
+            type: { type: String, enum: ['Point'] },
             coordinates: { type: [Number] } // [longitude, latitude]
         },
         radiusKm: { type: Number, default: 10 },
@@ -131,6 +131,16 @@ serviceProviderSchema.index({ verificationStatus: 1 });
 // Update the updatedAt field before saving
 serviceProviderSchema.pre('save', function(next) {
     this.updatedAt = new Date();
+    // Remove invalid geospatial entries to avoid partial GeoJSON
+    if (Array.isArray(this.serviceAreas)) {
+        this.serviceAreas = this.serviceAreas.filter(sa => {
+            if (!sa || !sa.location) return false;
+            const loc = sa.location;
+            const valid = loc && loc.type === 'Point' && Array.isArray(loc.coordinates) && loc.coordinates.length === 2 &&
+                typeof loc.coordinates[0] === 'number' && typeof loc.coordinates[1] === 'number';
+            return valid;
+        });
+    }
     next();
 });
 

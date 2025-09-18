@@ -105,12 +105,22 @@ export async function PUT(req) {
     const { id, location, ...rest } = body || {};
     if (!id) return Response.json({ ok: false, error: "Missing required field: id" }, { status: 400 });
 
-    const updates = {
-      ...rest,
-      ...(normalizeLocation(location) ? { location: normalizeLocation(location) } : {}),
-    };
+    // Build an update with $set/$unset so we can remove invalid location when requested
+    const setDoc = { ...rest };
+    const norm = normalizeLocation(location);
+    if (norm) {
+      setDoc.location = norm;
+    }
 
-    const updated = await User.findByIdAndUpdate(id, updates, { new: true });
+    const updateDoc = {};
+    if (Object.keys(setDoc).length) updateDoc.$set = setDoc;
+
+    // If client explicitly sends location: null, unset the field
+    if (location === null) {
+      updateDoc.$unset = { ...(updateDoc.$unset || {}), location: 1 };
+    }
+
+    const updated = await User.findByIdAndUpdate(id, updateDoc, { new: true });
     if (!updated) return Response.json({ ok: false, error: "User not found" }, { status: 404 });
     return Response.json({ ok: true, data: updated });
   } catch (err) {
