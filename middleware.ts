@@ -55,6 +55,15 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
+    // Gate admin routes
+    if (isAdminRoute(req)) {
+      if (role !== 'admin') {
+        const url = new URL('/home', req.url)
+        url.searchParams.set('error', 'admin-access-required')
+        return NextResponse.redirect(url)
+      }
+    }
+
     // Prevent service providers from accessing certain customer-only routes
     if (isCustomerOnlyRoute(req)) {
       if (role === 'serviceProvider') {
