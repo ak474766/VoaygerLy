@@ -66,7 +66,7 @@ const Header = () => {
 
             {/* Seller Dashboard Icon */}
             <Link
-              href="/service-provider/setup"
+              href="home/service-provider/setup"
               className="p-2 rounded-full hover:bg-gray-100 transition-colors group"
             >
               <svg
