@@ -47,7 +47,7 @@ const Navbar = () => {
         {isSeller && (
           <SignedIn>
             <button
-              onClick={() => router.push('/seller')}
+              onClick={() => router.push('/service-provider/dashboard')}
               className="text-xs border px-4 py-1.5 rounded-full hover:bg-gray-50 active:bg-gray-100 transition"
             >
               Seller Dashboard
@@ -110,7 +110,7 @@ const Navbar = () => {
             {isSeller && (
               <SignedIn>
                 <button
-                  onClick={() => { setMobileOpen(false); router.push('/seller'); }}
+                  onClick={() => { setMobileOpen(false); router.push('/service-provider/dashboard'); }}
                   className="text-xs border px-4 py-1.5 rounded-full self-start hover:bg-gray-50 active:bg-gray-100 transition"
                 >
                   Seller Dashboard

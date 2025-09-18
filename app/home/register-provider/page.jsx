@@ -1,14 +1,13 @@
 "use client"
 import React, { useState } from "react";
 import axios from "axios";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function RegisterProvider() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
     businessName: "",
-    phone: "",
     description: "",
     location: "",
     pricingType: "hourly",
@@ -18,13 +17,20 @@ export default function RegisterProvider() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
+  // Must match ServiceProvider schema enums
   const serviceCategories = [
-    { id: "plumbing", label: "🔧 Plumbing" },
-    { id: "electrical", label: "⚡ Electrical" },
-    { id: "cleaning", label: "🧹 Cleaning" },
-    { id: "carpentry", label: "🔨 Carpentry" },
-    { id: "painting", label: "🎨 Painting" },
-    { id: "gardening", label: "🌱 Gardening" }
+    { id: "plumber", label: "🔧 Plumbing" },
+    { id: "electrician", label: "⚡ Electrical" },
+    { id: "cleaner", label: "🧹 Cleaning" },
+    { id: "carpenter", label: "🔨 Carpentry" },
+    { id: "painter", label: "🎨 Painting" },
+    { id: "mechanic", label: "🔧 Mechanic" },
+    { id: "gardener", label: "🌱 Gardening" },
+    { id: "appliance-repair", label: "🧰 Appliance Repair" },
+    { id: "pest-control", label: "🐜 Pest Control" },
+    { id: "ac-repair", label: "❄️ AC Repair" },
+    { id: "home-security", label: "🔒 Home Security" },
+    { id: "other", label: "➕ Other" },
   ];
 
   const handleInputChange = (e) => {
@@ -50,22 +56,32 @@ export default function RegisterProvider() {
     setMessage("");
 
     try {
-      const response = await axios.post("/api/register-provider", formData);
-      setMessage("Registration successful! Welcome to our platform.");
-      setFormData({
-        fullName: "",
-        email: "",
-        password: "",
-        businessName: "",
-        phone: "",
-        description: "",
-        location: "",
-        pricingType: "hourly",
-        baseRate: "",
-        categories: []
-      });
+      // Build payload that matches /api/service-provider/register
+      const payload = {
+        businessName: formData.businessName,
+        description: formData.description,
+        categories: formData.categories,
+        skills: [],
+        pricing: {
+          type: formData.pricingType, // 'hourly' | 'fixed' | 'both'
+          hourlyRate: formData.baseRate ? Number(formData.baseRate) : undefined,
+          currency: 'INR',
+        },
+        serviceAreas: formData.location ? [{ areaName: formData.location }] : [],
+        availability: {
+          workingDays: [],
+          timeSlotDuration: 60,
+          advanceBookingDays: 30,
+        },
+      };
+
+      const response = await axios.post("/api/service-provider/register", payload);
+      setMessage("Registration successful! Redirecting to dashboard...");
+      // Redirect to provider dashboard
+      router.push('/service-provider/dashboard');
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed. Please try again.");
+      const apiMsg = error?.response?.data?.error || error?.response?.data?.message;
+      setMessage(apiMsg || "Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,6 +99,12 @@ export default function RegisterProvider() {
           </p>
         </div>
 
+        <SignedOut>
+          <div className="mb-6 p-4 rounded-lg bg-yellow-50 text-yellow-800 border border-yellow-200">
+            Please sign in first to register as a service provider.
+          </div>
+        </SignedOut>
+
         {message && (
           <div className={`mb-6 p-4 rounded-lg ${message.includes("successful") 
             ? "bg-green-50 text-green-700 border border-green-200" 
@@ -96,37 +118,6 @@ export default function RegisterProvider() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input
               required
-              name="fullName"
-              placeholder="Full Name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              type="text"
-              value={formData.fullName}
-              onChange={handleInputChange}
-            />
-            <input
-              required
-              name="email"
-              placeholder="Email address"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <input
-            required
-            name="password"
-            placeholder="Password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            type="password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <input
-              required
               name="businessName"
               placeholder="Business Name"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -135,12 +126,35 @@ export default function RegisterProvider() {
               onChange={handleInputChange}
             />
             <input
-              required
-              name="phone"
-              placeholder="Phone Number"
+              name="location"
+              placeholder="Service Location (City, State)"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              type="tel"
-              value={formData.phone}
+              type="text"
+              value={formData.location}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <select
+              name="pricingType"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              value={formData.pricingType}
+              onChange={handleInputChange}
+            >
+              <option value="hourly">Hourly Rate</option>
+              <option value="fixed">Fixed Price</option>
+              <option value="both">Both</option>
+            </select>
+            <input
+              required
+              name="baseRate"
+              placeholder="Base Rate (₹)"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              min="0"
+              step="0.01"
+              type="number"
+              value={formData.baseRate}
               onChange={handleInputChange}
             />
           </div>
@@ -155,38 +169,10 @@ export default function RegisterProvider() {
             onChange={handleInputChange}
           />
 
-          <input
-            required
-            name="location"
-            placeholder="Service Location (City, State)"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            type="text"
-            value={formData.location}
-            onChange={handleInputChange}
-          />
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <select
-              name="pricingType"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              value={formData.pricingType}
-              onChange={handleInputChange}
-            >
-              <option value="hourly">Hourly Rate</option>
-              <option value="fixed">Fixed Price</option>
-              <option value="package">Package Deal</option>
-            </select>
-            <input
-              required
-              name="baseRate"
-              placeholder="Base Rate (₹)"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              min="0"
-              step="0.01"
-              type="number"
-              value={formData.baseRate}
-              onChange={handleInputChange}
-            />
+            {/* Reserved for future fields */}
+            <div></div>
+            <div></div>
           </div>
 
           <div>

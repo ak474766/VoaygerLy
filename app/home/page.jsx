@@ -1,13 +1,33 @@
 "use client"
 import React, { useState } from "react";
 import { useAppContext } from "@/context/AppContext";
-import { serviceCategories } from "@/assets/assets";
+// Categories aligned with ServiceProvider schema enums
+const schemaCategories = [
+  { id: "plumber", name: "🔧 Plumbing" },
+  { id: "electrician", name: "⚡ Electrical" },
+  { id: "cleaner", name: "🧹 Cleaning" },
+  { id: "carpenter", name: "🔨 Carpentry" },
+  { id: "painter", name: "🎨 Painting" },
+  { id: "mechanic", name: "🔧 Mechanic" },
+  { id: "gardener", name: "🌱 Gardening" },
+  { id: "appliance-repair", name: "🧰 Appliance Repair" },
+  { id: "pest-control", name: "🐜 Pest Control" },
+  { id: "ac-repair", name: "❄️ AC Repair" },
+  { id: "home-security", name: "🔒 Home Security" },
+  { id: "other", name: "➕ Other" },
+];
 
 export default function HomePage() {
   const { products } = useAppContext();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [location, setLocation] = useState("");
   const [minRating, setMinRating] = useState("");
+  const [displayed, setDisplayed] = useState(products || []);
+
+  // Keep displayed list in sync with context on initial load
+  React.useEffect(() => {
+    setDisplayed(products || []);
+  }, [products]);
 
   const renderStars = (rating) => {
     const stars = [];
@@ -25,7 +45,7 @@ export default function HomePage() {
           strokeLinecap="round"
           strokeLinejoin="round"
           className={`h-4 w-4 ${
-            i <= Math.floor(rating)
+            i <= Math.floor(rating || 0)
               ? "text-yellow-400 fill-current"
               : "text-gray-300"
           }`}
@@ -35,6 +55,26 @@ export default function HomePage() {
       );
     }
     return stars;
+  };
+
+  const handleSearch = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory) params.set("category", selectedCategory);
+      if (minRating) params.set("minRating", String(minRating));
+      if (location) params.set("city", location);
+      const url = `/api/service-provider/list${params.toString() ? `?${params.toString()}` : ""}`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {
+        console.error('Search fetch failed');
+        return;
+      }
+      const json = await res.json();
+      const data = json?.data || [];
+      setDisplayed(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Search error', e);
+    }
   };
 
   return (
@@ -65,7 +105,7 @@ export default function HomePage() {
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm md:text-base font-medium bg-gray-50 hover:bg-white"
               >
                 <option value="">🔍 All Categories</option>
-                {serviceCategories.map((category) => (
+                {schemaCategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -88,7 +128,7 @@ export default function HomePage() {
                 value={minRating}
                 onChange={(e) => setMinRating(e.target.value)}
               />
-              <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-4 rounded-xl flex items-center justify-center space-x-2 font-bold shadow-xl transition-all duration-200 transform hover:scale-105 hover:shadow-2xl text-sm md:text-base">
+              <button onClick={handleSearch} className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-4 rounded-xl flex items-center justify-center space-x-2 font-bold shadow-xl transition-all duration-200 transform hover:scale-105 hover:shadow-2xl text-sm md:text-base">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -176,7 +216,7 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Discover trusted professionals in your area with verified ratings and transparent pricing</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {products.map((provider) => (
+          {displayed.map((provider) => (
             <div
               key={provider._id}
               className="bg-white rounded-2xl shadow-lg p-6 md:p-8 hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-blue-300 transform hover:-translate-y-2 hover:scale-[1.02] group"
@@ -184,17 +224,19 @@ export default function HomePage() {
               <div className="flex items-start justify-between mb-6">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 truncate group-hover:text-blue-600 transition-colors">{provider.businessName}</h3>
-                  <p className="text-gray-600 font-semibold text-base md:text-lg truncate">{provider.providerName}</p>
+                  {provider.description && (
+                    <p className="text-gray-600 text-sm md:text-base truncate">{provider.description}</p>
+                  )}
                   <div className="flex items-center mt-2 mb-3">
                     <div className="flex items-center space-x-1">
-                      {renderStars(provider.rating)}
+                      {renderStars(provider?.rating?.average)}
                     </div>
-                    <span className="ml-2 text-xs md:text-sm font-semibold text-gray-700">{provider.rating.toFixed(1)}</span>
-                    <span className="text-xs md:text-sm text-gray-500">({provider.reviewCount} reviews)</span>
+                    <span className="ml-2 text-xs md:text-sm font-semibold text-gray-700">{Number(provider?.rating?.average || 0).toFixed(1)}</span>
+                    <span className="text-xs md:text-sm text-gray-500">({provider?.rating?.count || 0} reviews)</span>
                   </div>
                 </div>
                 <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full text-sm md:text-base font-bold whitespace-nowrap ml-4 shadow-lg">
-                  ₹{provider.hourlyRate}/hr
+                  ₹{provider?.pricing?.hourlyRate ?? 0}/hr
                 </div>
               </div>
               <p className="text-gray-700 mb-6 text-base md:text-lg line-clamp-3 leading-relaxed">{provider.description}</p>
@@ -215,39 +257,22 @@ export default function HomePage() {
                     <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                   </svg>
-                  <span className="font-medium truncate">{provider.location}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-xs md:text-sm text-gray-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4 text-green-500 flex-shrink-0"
-                  >
-                    <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"></path>
-                  </svg>
-                  <span className="font-medium">{provider.phone}</span>
+                  <span className="font-medium truncate">{provider?.serviceAreas?.[0]?.areaName || 'Available in your city'}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 md:gap-3 mb-6">
-                {provider.categoryNames.map((category, index) => (
+                {(provider.categories || []).map((category, index) => (
                   <span
                     key={index}
                     className="bg-blue-50 text-blue-700 px-3 md:px-4 py-2 rounded-full text-sm font-semibold border border-blue-200 hover:bg-blue-100 transition-colors"
                   >
-                    {category}
+                    {String(category).replace('-', ' ')}
                   </span>
                 ))}
               </div>
               <a
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-xl text-center block transition-all duration-200 font-bold shadow-lg hover:shadow-xl text-base md:text-lg transform hover:scale-[1.02]"
-                href={`/provider/${provider._id}`}
+                href={`/product/${provider._id}`}
               >
                 View Details & Book Service
               </a>

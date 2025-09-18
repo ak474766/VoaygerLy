@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
+import { randomUUID } from "crypto";
 
 const bookingSchema = new mongoose.Schema({
     bookingId: { 
         type: String, 
         required: true, 
         unique: true,
-        default: () => `BK${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`
+        default: () => `BK-${randomUUID()}`
     },
     
     // Parties involved
@@ -38,7 +39,7 @@ const bookingSchema = new mongoose.Schema({
         state: { type: String, required: true },
         pincode: { type: String, required: true },
         coordinates: {
-            type: { type: String, enum: ['Point'], default: 'Point' },
+            type: { type: String, enum: ['Point'] },
             coordinates: { type: [Number] } // [longitude, latitude]
         },
         landmark: { type: String },
@@ -129,8 +130,6 @@ const bookingSchema = new mongoose.Schema({
     emergencyService: { type: Boolean, default: false },
     
     // Metadata
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
 }, { 
     minimize: false,
     timestamps: true 
@@ -150,8 +149,6 @@ bookingSchema.index({ "serviceLocation.coordinates": "2dsphere" }, { sparse: tru
 
 // Update timeline when status changes
 bookingSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    
     // Add to timeline if status changed
     if (this.isModified('status')) {
         this.timeline.push({
@@ -160,7 +157,6 @@ bookingSchema.pre('save', function(next) {
             updatedBy: this.userId // This should be set by the API
         });
     }
-    
     next();
 });
 

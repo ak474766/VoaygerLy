@@ -17,17 +17,50 @@ const isAdminRoute = createRouteMatcher([
   '/admin(.*)',
 ])
 
+const isCustomerOnlyRoute = createRouteMatcher([
+  '/home/cart(.*)',
+  '/home/my-orders(.*)',
+  '/home/order-placed(.*)',
+  '/home/add-address(.*)'
+])
+
 export default clerkMiddleware(async (auth, req) => {
   // Protect all routes that require authentication
   if (isProtectedRoute(req)) {
     await auth.protect()
     
-    const { userId } = await auth()
-    
-    if (userId && (isServiceProviderRoute(req) || isAdminRoute(req))) {
-      // For service provider and admin routes, we'll let the pages handle role checking
-      // since we need to make API calls to get user role from our database
-      return NextResponse.next()
+    const { userId, sessionClaims } = await auth()
+
+    // Try to read role from Clerk public metadata first
+    let role = (sessionClaims?.publicMetadata as any)?.role as string | undefined
+
+    // If role not in Clerk, fetch from our DB via API
+    if (!role && userId) {
+      try {
+        const url = new URL('/api/auth/register', req.url)
+        const resp = await fetch(url, { headers: { 'x-middleware-fetch': '1' } })
+        if (resp.ok) {
+          const data = await resp.json()
+          role = data?.user?.role
+        }
+      } catch {}
+    }
+
+    // Gate service provider routes
+    if (isServiceProviderRoute(req)) {
+      if (role !== 'serviceProvider') {
+        const url = new URL('/home', req.url)
+        url.searchParams.set('error', 'forbidden')
+        return NextResponse.redirect(url)
+      }
+    }
+
+    // Prevent service providers from accessing certain customer-only routes
+    if (isCustomerOnlyRoute(req)) {
+      if (role === 'serviceProvider') {
+        const url = new URL('/service-provider/dashboard', req.url)
+        return NextResponse.redirect(url)
+      }
     }
   }
   

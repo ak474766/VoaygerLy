@@ -63,9 +63,6 @@ const reviewSchema = new mongoose.Schema({
     // Verification
     isVerified: { type: Boolean, default: true }, // Verified booking = verified review
     
-    // Metadata
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
 }, { 
     minimize: false,
     timestamps: true 
@@ -77,14 +74,9 @@ reviewSchema.index({ serviceProviderId: 1 });
 reviewSchema.index({ bookingId: 1 });
 reviewSchema.index({ rating: -1 });
 reviewSchema.index({ "moderation.status": 1 });
-reviewSchema.index({ createdAt: -1 });
 reviewSchema.index({ isVerified: 1 });
 
-// Update the updatedAt field before saving
-reviewSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    next();
-});
+// No manual updatedAt handling; timestamps option manages it
 
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 

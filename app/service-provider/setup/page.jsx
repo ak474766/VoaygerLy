@@ -2,11 +2,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
+import Image from 'next/image'
 
 export default function ServiceProviderSetup() {
   const { user } = useUser()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [formData, setFormData] = useState({
     businessName: '',
     description: '',
@@ -22,7 +24,8 @@ export default function ServiceProviderSetup() {
       workingDays: [],
       timeSlotDuration: 60,
       advanceBookingDays: 30
-    }
+    },
+    photos: []
   })
 
   const serviceCategories = [
@@ -78,6 +81,100 @@ export default function ServiceProviderSetup() {
     }))
   }
 
+  const handleServiceAreaAdd = () => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: [...prev.serviceAreas, {
+        areaName: '',
+        radiusKm: 10,
+        location: null
+      }]
+    }))
+  }
+
+  const handleServiceAreaChange = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: prev.serviceAreas.map((area, i) => 
+        i === index ? { ...area, [field]: value } : area
+      )
+    }))
+  }
+
+  const handleServiceAreaRemove = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: prev.serviceAreas.filter((_, i) => i !== index)
+    }))
+  }
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploadingImage(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'service-providers')
+
+      const response = await fetch('/api/upload', {
+        method: 'PUT',
+        body: formData
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        setFormData(prev => ({
+          ...prev,
+          photos: [...prev.photos, result.data.url]
+        }))
+      } else {
+        alert('Image upload failed')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Image upload failed')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleImageRemove = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index)
+    }))
+  }
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          // Add current location as a service area
+          setFormData(prev => ({
+            ...prev,
+            serviceAreas: [...prev.serviceAreas, {
+              areaName: 'Current Location',
+              radiusKm: 10,
+              location: {
+                type: 'Point',
+                coordinates: [longitude, latitude]
+              }
+            }]
+          }))
+        },
+        (error) => {
+          console.error('Location error:', error)
+          alert('Could not get your location. Please add service areas manually.')
+        }
+      )
+    } else {
+      alert('Geolocation is not supported by this browser.')
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -92,9 +189,11 @@ export default function ServiceProviderSetup() {
       })
 
       if (response.ok) {
+        alert('Service provider profile created successfully! Your profile is pending verification.')
         router.push('/service-provider/dashboard')
       } else {
-        alert('Error setting up service provider profile')
+        const error = await response.json()
+        alert('Error setting up service provider profile: ' + (error.error || 'Unknown error'))
       }
     } catch (error) {
       console.error('Error:', error)
@@ -230,10 +329,11 @@ export default function ServiceProviderSetup() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Hourly Rate (₹)
+                    Hourly Rate (₹) *
                   </label>
                   <input
                     type="number"
+                    required
                     value={formData.pricing.hourlyRate}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
@@ -243,6 +343,114 @@ export default function ServiceProviderSetup() {
                     placeholder="Enter hourly rate"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Service Areas */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-800">Service Areas</h2>
+                <div className="space-x-2">
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Use Current Location
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleServiceAreaAdd}
+                    className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  >
+                    Add Area
+                  </button>
+                </div>
+              </div>
+              
+              {formData.serviceAreas.map((area, index) => (
+                <div key={index} className="border border-gray-200 rounded-md p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Area Name
+                      </label>
+                      <input
+                        type="text"
+                        value={area.areaName}
+                        onChange={(e) => handleServiceAreaChange(index, 'areaName', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="e.g., Downtown, Sector 21"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Service Radius (km)
+                      </label>
+                      <input
+                        type="number"
+                        value={area.radiusKm}
+                        onChange={(e) => handleServiceAreaChange(index, 'radiusKm', Number(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        min="1"
+                        max="50"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => handleServiceAreaRemove(index)}
+                        className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Photos */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-gray-800">Photos</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {formData.photos.map((photo, index) => (
+                  <div key={index} className="relative">
+                    <Image
+                      src={photo}
+                      alt={`Photo ${index + 1}`}
+                      width={200}
+                      height={150}
+                      className="w-full h-32 object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleImageRemove(index)}
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <label className="border-2 border-dashed border-gray-300 rounded-md h-32 flex items-center justify-center cursor-pointer hover:border-indigo-500">
+                  <div className="text-center">
+                    {uploadingImage ? (
+                      <div className="text-gray-500">Uploading...</div>
+                    ) : (
+                      <>
+                        <div className="text-gray-400 text-2xl mb-2">+</div>
+                        <div className="text-sm text-gray-500">Add Photo</div>
+                      </>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={uploadingImage}
+                  />
+                </label>
               </div>
             </div>
 
@@ -275,7 +483,7 @@ export default function ServiceProviderSetup() {
               </button>
               <button
                 type="submit"
-                disabled={loading || formData.categories.length === 0}
+                disabled={loading || formData.categories.length === 0 || !formData.pricing.hourlyRate}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Setting up...' : 'Complete Setup'}

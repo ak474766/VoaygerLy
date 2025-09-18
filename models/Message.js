@@ -50,11 +50,7 @@ const messageSchema = new mongoose.Schema({
     replyTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
     
     // Message encryption (optional)
-    isEncrypted: { type: Boolean, default: false },
-    
-    // Metadata
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    isEncrypted: { type: Boolean, default: false }
 }, { 
     minimize: false,
     timestamps: true 
@@ -66,12 +62,7 @@ messageSchema.index({ bookingId: 1 });
 messageSchema.index({ createdAt: -1 });
 messageSchema.index({ status: 1 });
 
-// Update the updatedAt field before saving
-messageSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    next();
-});
-
 const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
 
 export default Message;
+

@@ -43,9 +43,7 @@ const userSchema = new mongoose.Schema({
     },
     
     // Metadata
-    lastLogin: { type: Date },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    lastLogin: { type: Date }
 }, { 
     minimize: false,
     timestamps: true 
@@ -66,10 +64,8 @@ userSchema.index(
 );
 userSchema.index({ isActive: 1 });
 
-// Update the updatedAt field before saving
+// Strip invalid/empty location structures to avoid inserting partial GeoJSON
 userSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    // Strip invalid/empty location structures to avoid inserting partial GeoJSON
     if (this.location) {
         const loc = this.location;
         const hasAddress = !!(loc.address || loc.city || loc.state || loc.pincode);

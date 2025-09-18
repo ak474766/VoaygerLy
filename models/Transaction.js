@@ -105,8 +105,6 @@ const transactionSchema = new mongoose.Schema({
         source: { type: String, enum: ['web', 'mobile', 'admin'], default: 'web' }
     },
     
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
 }, { 
     minimize: false,
     timestamps: true 
@@ -119,14 +117,9 @@ transactionSchema.index({ serviceProviderId: 1 });
 transactionSchema.index({ bookingId: 1 });
 transactionSchema.index({ type: 1 });
 transactionSchema.index({ status: 1 });
-transactionSchema.index({ createdAt: -1 });
 transactionSchema.index({ "paymentMethod.type": 1 });
 
-// Update the updatedAt field before saving
-transactionSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    next();
-});
+// No manual updatedAt handling; timestamps option manages it
 
 const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
 

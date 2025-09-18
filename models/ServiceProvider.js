@@ -111,8 +111,6 @@ const serviceProviderSchema = new mongoose.Schema({
         }
     },
     
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
 }, { 
     minimize: false,
     timestamps: true 
@@ -128,10 +126,8 @@ serviceProviderSchema.index({ "pricing.hourlyRate": 1 });
 serviceProviderSchema.index({ isActive: 1, isVerified: 1 });
 serviceProviderSchema.index({ verificationStatus: 1 });
 
-// Update the updatedAt field before saving
+// Remove invalid geospatial entries to avoid partial GeoJSON
 serviceProviderSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    // Remove invalid geospatial entries to avoid partial GeoJSON
     if (Array.isArray(this.serviceAreas)) {
         this.serviceAreas = this.serviceAreas.filter(sa => {
             if (!sa || !sa.location) return false;
